@@ -1,0 +1,11 @@
+default_label: NoGesture
+segment_labels: ["Gesture"]
+
+models:
+- name: EnvisionHGDetectorLightGBM
+  module: models.envisionhgdetector_lightgbm.EnvisionHGDetectorLightGBM
+  enabled: true
+
+- name: EnvisionHGDetectorCNN
+  module: models.envisionhgdetector_cnn.EnvisionHGDetectorCNN
+  enabled: true
