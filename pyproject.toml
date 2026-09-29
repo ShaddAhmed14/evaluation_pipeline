@@ -1,0 +1,14 @@
+[project]
+name = "evaluation-pipeline"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "docker>=7.2.0",
+    "opencv-python>=5.0.0.93",
+    "pandas>=3.0.5",
+    "python-dotenv>=1.2.3",
+    "pyyaml>=6.0.3",
+    "scikit-learn>=1.9.1",
+]

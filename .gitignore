@@ -1,0 +1,10 @@
+__pycache__/
+
+Logs/
+envision_dataset_v1/
+output/
+evaluation_results/
+labelled_videos/
+predictions_clip_based/
+predictions_video_based/
+ground_truth/
