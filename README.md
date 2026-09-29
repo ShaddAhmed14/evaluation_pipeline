@@ -40,8 +40,8 @@ The command runs clip evaluation first, then full video evaluation. It creates o
 
 ## Features and output
 
-- **Clip evaluation:** Uses the most common frame prediction per clip. Reports per-label accuracy, precision, recall, and F1, plus balanced accuracy and macro and weighted F1 in `<EVALUATION_FOLDER>/clip_based/evaluation_metrics.csv`.
-- **Video evaluation:** Builds gesture segments from frame predictions and compares them with clip timestamps. Reports frame precision, recall, and F1, plus segment overlap, hit/miss rates, false positive rate, fragmentation, and boundary errors in `<EVALUATION_FOLDER>/video_based/`.
+- **Clip evaluation:** Uses the most common frame prediction per clip. Reports per-label accuracy, precision, recall, and F1, plus balanced accuracy and macro and weighted F1. Writes one row per model to `<EVALUATION_FOLDER>/clip_based/evaluation_metrics.csv` and one row per model and corpus to `evaluation_metrics_by_corpus.csv` in the same folder.
+- **Video evaluation:** Converts clip timestamps to frame labels and compares them with predictions at matching frame indices for frame precision, recall, and F1. It also compares predicted segments with clip intervals for overlap, hit/miss rates, false positive rate, fragmentation, and boundary errors. Writes per-model frame and segment metrics to `frame_based_evaluation_results.csv` and `segment_based_evaluation_results.csv`, plus per-model and per-corpus metrics to `frame_based_evaluation_results_by_corpus.csv` and `segment_based_evaluation_results_by_corpus.csv` in `<EVALUATION_FOLDER>/video_based/`. Each video contributes equally to these averages.
 - **Ground truth export:** Writes `<video>_groundtruth.csv` files to `SAVE_GROUND_TRUTH_FOLDER` and caches FPS values in `<EVALUATION_FOLDER>/video_based/fps_info.json`.
 - **Model selection:** Edit `config.yaml` to enable or disable models and set `default_label` and `segment_labels`. The included models are EnvisionHGDetector LightGBM and CNN.
 
