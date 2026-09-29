@@ -8,12 +8,12 @@ load_dotenv()  # Load environment variables from .env file
 
 def main():
     N = 1 # # of samples per label / corpus
-    clips_input_dir = Path(os.environ("INPUT_FOLDER_CLIPS"))
-    video_input_dir = Path(os.environ("VIDEO_FOLDER_VIDEOS"))
-    clips_prediction_dir = Path(os.environ("PREDICTION_FOLDER_CLIP_BASED"))
-    video_prediction_dir = Path(os.environ("PREDICTION_FOLDER_VIDEOS_BASED"))
-    video_ground_truth_dir = Path(os.environ("SAVE_GROUND_TRUTH_FOLDER"))
-    output_dir = Path(os.environ("LABELLED_VIDEOS_FOLDER"))
+    clips_input_dir = Path(os.getenv("INPUT_FOLDER_CLIPS"))
+    video_input_dir = Path(os.getenv("VIDEO_FOLDER_VIDEOS"))
+    clips_prediction_dir = Path(os.getenv("PREDICTION_FOLDER_CLIP_BASED"))
+    video_prediction_dir = Path(os.getenv("PREDICTION_FOLDER_VIDEOS_BASED"))
+    video_ground_truth_dir = Path(os.getenv("SAVE_GROUND_TRUTH_FOLDER"))
+    output_dir = Path(os.getenv("LABELLED_VIDEOS_FOLDER"))
     clips_output_dir = output_dir / "clips"
     video_output_dir = output_dir / "videos"
     
