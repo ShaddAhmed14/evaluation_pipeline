@@ -39,16 +39,16 @@ def main():
     SAVE_GROUND_TRUTH_FOLDER.mkdir(parents=True, exist_ok=True)
 
     config = load_config()
-    default_label = config.get("default_label", "NoGesture")
-    segment_labels = config.get("segment_labels") # video based
+    default_label = config.get("default_label")
+    segment_label = config.get("segment_label") # video based
 
     models = load_models(config.get("models"), docker_client)
     model_names = [model.name for model in models]
 
     run_clips_pipeline(INPUT_FOLDER_CLIPS, PREDICTION_FOLDER_CLIP_BASED, models, default_label, model_names, EVALUATION_FOLDER_CLIPS)
-    run_videos_pipeline(INPUT_FOLDER_VIDEOS, PREDICTION_FOLDER_VIDEOS_BASED, segment_labels, model_names, models, EVALUATION_FOLDER_VIDEOS, CLIPS_INFO_FOLDER, SAVE_GROUND_TRUTH_FOLDER)
+    run_videos_pipeline(INPUT_FOLDER_VIDEOS, PREDICTION_FOLDER_VIDEOS_BASED, segment_label, model_names, models, EVALUATION_FOLDER_VIDEOS, CLIPS_INFO_FOLDER, SAVE_GROUND_TRUTH_FOLDER, default_label)
 
-def run_videos_pipeline(INPUT_FOLDER: Path, PREDICTION_FOLDER: Path, segment_labels: list, model_names: list, models: list, EVALUATION_FOLDER: Path, CLIPS_INFO_FOLDER: Path, SAVE_GROUND_TRUTH_FOLDER: Path):
+def run_videos_pipeline(INPUT_FOLDER: Path, PREDICTION_FOLDER: Path, segment_label: str, model_names: list, models: list, EVALUATION_FOLDER: Path, CLIPS_INFO_FOLDER: Path, SAVE_GROUND_TRUTH_FOLDER: Path, default_label: str):
     print('Running models on VIDEOS INPUT data...')
     run_model(models, [INPUT_FOLDER], PREDICTION_FOLDER)
 
@@ -66,7 +66,8 @@ def run_videos_pipeline(INPUT_FOLDER: Path, PREDICTION_FOLDER: Path, segment_lab
         evaluation_folder=EVALUATION_FOLDER,
         clips_info_folder=CLIPS_INFO_FOLDER,
         save_ground_truth_folder=SAVE_GROUND_TRUTH_FOLDER,
-        segment_labels=segment_labels,
+        segment_label=segment_label,
+        default_label=default_label
     )
     video_based_evaluator.evaluate()
 

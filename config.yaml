@@ -1,5 +1,5 @@
 default_label: NoGesture
-segment_labels: ["Gesture"]
+segment_label: Gesture
 
 models:
 - name: EnvisionHGDetectorLightGBM

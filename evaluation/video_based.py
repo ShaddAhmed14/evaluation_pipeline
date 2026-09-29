@@ -6,14 +6,15 @@ from pathlib import Path
 from typing import List, Tuple
 
 class VideoBasedEvaluator:
-    def __init__(self, video_files_mapping: dict, models: list, prediction_folder: Path, evaluation_folder: Path, clips_info_folder: Path, save_ground_truth_folder: Path, segment_labels: list):
+    def __init__(self, video_files_mapping: dict, models: list, prediction_folder: Path, evaluation_folder: Path, clips_info_folder: Path, save_ground_truth_folder: Path, segment_label: str, default_label: str):
         self.prediction_folder = prediction_folder
         self.evaluation_folder = evaluation_folder
         self.clips_info_folder = clips_info_folder
         self.save_ground_truth_folder = save_ground_truth_folder
-        self.segment_labels = segment_labels
+        self.segment_label = segment_label
         self.video_files_mapping = video_files_mapping
         self.models = models
+        self.default_label = default_label
         self.iou_threshold = 0.5
 
         self.fps_json_path = self.evaluation_folder / "fps_info.json"
@@ -50,12 +51,11 @@ class VideoBasedEvaluator:
             segments_predicted[video_name] = []
             current_segment_start = None
 
-            # NOTE: works for 2 labels only, if more than 2 labels, need to modify this logic
             for index, row in df.iterrows():
                 frame_number = row['frame_index']
                 prediction_label = row['prediction']
 
-                if prediction_label in self.segment_labels:
+                if prediction_label == self.segment_label:
                     if current_segment_start is None: # new segment starts
                         current_segment_start = frame_number
                     # else continue the segment
@@ -85,7 +85,7 @@ class VideoBasedEvaluator:
             return [
                 (clip['start'], clip['end'])
                 for clip in clip_info
-                if clip.get('label') in self.segment_labels
+                if clip.get('label') == self.segment_label
             ]
         except (OSError, ValueError, TypeError, KeyError) as exc:
             logging.warning("Cannot load clip info for %s: %s. Skipping.", video_name, exc)
@@ -123,7 +123,7 @@ class VideoBasedEvaluator:
         return fps_info
 
     def save_ground_truth_frames(self, video_name: str, segments: List[Tuple[float, float]], frame_count: int) -> pd.DataFrame | None:
-        """Label frame timestamps in [start, end) as Gesture."""
+        """Label frame timestamps in [start, end) for segment_label"""
         fps = self.fps_info.get(video_name)
         if fps is None or not np.isfinite(fps) or fps <= 0:
             logging.warning("Missing or invalid FPS for %s. Skipping.", video_name)
@@ -135,7 +135,7 @@ class VideoBasedEvaluator:
             gesture |= (frame_indices / fps >= start) & (frame_indices / fps < end)
         ground_truth = pd.DataFrame({
             'frame_index': frame_indices,
-            'ground_truth': np.where(gesture, self.segment_labels[0], 'NoGesture'),
+            'ground_truth': np.where(gesture, self.segment_label, self.default_label),
         })
         try:
             self.save_ground_truth_folder.mkdir(parents=True, exist_ok=True)
@@ -160,8 +160,8 @@ class VideoBasedEvaluator:
             return None
 
         aligned = ground_truth.merge(predictions[['frame_index', 'prediction']], on='frame_index', validate='one_to_one')
-        reference = aligned['ground_truth'].isin(self.segment_labels)
-        comparison = aligned['prediction'].isin(self.segment_labels)
+        reference = aligned['ground_truth'].eq(self.segment_label)
+        comparison = aligned['prediction'].eq(self.segment_label)
         tp = (reference & comparison).sum()
         fp = (~reference & comparison).sum()
         fn = (reference & ~comparison).sum()
