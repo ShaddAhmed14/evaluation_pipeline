@@ -62,6 +62,7 @@ class ClipBasedEvaluator:
                     output_file_path = self.output_folder / model_name  / f"{input_file.stem}_predictions.csv"
                     combined_predictions.append({
                         'file_name': input_file.stem,
+                        'corpus': input_file.stem.split('_', 1)[0],
                         'true_label': metalabel,
                         'model_name': model_name,
                         'prediction': self.return_mode(output_file_path, model_name)
@@ -76,3 +77,10 @@ class ClipBasedEvaluator:
         )
 
         result.to_csv(self.evaluation_folder / "evaluation_metrics.csv", index=False)
+
+        corpus_result = (
+            combined_predictions_df.groupby(['model_name', 'corpus'], sort=False)
+            .apply(self.per_model_metrics)
+            .reset_index()
+        )
+        corpus_result.to_csv(self.evaluation_folder / "evaluation_metrics_by_corpus.csv", index=False)

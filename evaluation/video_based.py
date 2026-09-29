@@ -291,29 +291,40 @@ class VideoBasedEvaluator:
                 frame_based_results.setdefault(model_name, {})[video_name] = frame_metrics
                 segment_based_results.setdefault(model_name, {})[video_name] = segment_metrics
 
-        def average_video_metrics(results: dict) -> pd.DataFrame:
+        def average_video_metrics(results: dict, by_corpus: bool = False) -> pd.DataFrame:
             rows = [
-                {"model_name": model_name, "video_name": video_name, **metrics}
+                {
+                    "model_name": model_name,
+                    "video_name": video_name,
+                    "corpus": video_name.split("_", 1)[0],
+                    **metrics,
+                }
                 for model_name, videos in results.items()
                 for video_name, metrics in videos.items()
             ]
+            group_columns = ["model_name", "corpus"] if by_corpus else ["model_name"]
+            cols = ["video_name"] if by_corpus else ["video_name", "corpus"]
             if not rows:
-                return pd.DataFrame(columns=["model_name"])
+                return pd.DataFrame(columns=group_columns)
 
             return (
                 pd.DataFrame(rows)
-                .drop(columns="video_name")
-                .groupby("model_name", sort=False, as_index=False)
+                .drop(columns=cols)
+                .groupby(group_columns, sort=False, as_index=False)
                 .mean(numeric_only=True)
                 .round(3)
             )
 
         frame_based_df = average_video_metrics(frame_based_results)
         segment_based_df = average_video_metrics(segment_based_results)
+        frame_based_corpus_df = average_video_metrics(frame_based_results, by_corpus=True)
+        segment_based_corpus_df = average_video_metrics(segment_based_results, by_corpus=True)
 
         for name, result in (
             ("frame_based_evaluation_results.csv", frame_based_df),
             ("segment_based_evaluation_results.csv", segment_based_df),
+            ("frame_based_evaluation_results_by_corpus.csv", frame_based_corpus_df),
+            ("segment_based_evaluation_results_by_corpus.csv", segment_based_corpus_df),
         ):
             try:
                 result.to_csv(self.evaluation_folder / name, index=False)
