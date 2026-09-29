@@ -33,7 +33,7 @@ Use paths that Docker can mount. For the optional video annotation script, also 
 ## Run
 
 ```sh
-uv run main.py
+uv run src/main.py
 ```
 
 The command runs clip evaluation first, then full video evaluation. It creates output folders as needed and writes logs to `Logs/`.
@@ -52,6 +52,6 @@ Model predictions are stored under each prediction folder in a subfolder named a
 `label.py` is intended to sample source `.mp4` files and overlay predictions (and full video ground truth, when available):
 
 ```sh
-uv run label.py
+uv run src/label.py
 ```
 

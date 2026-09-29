@@ -109,7 +109,7 @@ def parse_code_file(code_file: str) -> tuple[str, str]:
     return module_path, class_name
 
 def load_config() -> dict:
-    config_file_path = "config.yaml"
+    config_file_path = Path(__file__).resolve().with_name("config.yaml")
 
     with open(config_file_path, "r") as f:
         config = yaml.safe_load(f)
